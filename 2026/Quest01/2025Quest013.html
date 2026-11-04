@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Everybody Codes</title>
+<script>
+
+function everybodyCodesFunction(input) {
+
+	const file = input.files[0];
+	const reader = new FileReader();
+
+	reader.onload = (event) => {
+		const file = event.target.result;
+		const outposts = file.split(',').map(Number);
+
+		let result = outposts.reduce((cones,outpost) => {
+			let edge = Math.ceil(Math.sqrt(outpost))
+			edge = edge < 3 ? 3:(edge | 1) // next odd number
+			let frame = (edge**2) - 1
+		    while(frame < outpost) {
+				edge+=2
+				frame = (edge**2) - 1
+			}
+			console.log(outpost,edge,frame,frame - outpost)
+			cones += frame - outpost
+			return cones
+		},0);
+
+		document.getElementById('result').value = result;
+	};
+
+	reader.onerror = (event) => {
+		alert(event.target.error.name);
+	};
+
+	reader.readAsText(file);
+}
+
+window.onload = function() {
+	document.getElementById('file').addEventListener('change',function() {
+		document.getElementById('result').value = 0;
+		everybodyCodesFunction(this)
+	})
+}
+
+</script>
+</head>
+<body>
+	<input type="file" name="file" id="file" accept=".txt">
+	<hr />
+	<label for="result">Result</label>
+	<textarea id="result"></textarea>
+</body>
+</html>
