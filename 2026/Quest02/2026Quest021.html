@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Everybody Codes</title>
+<script>
+
+function everybodyCodesFunction(input) {
+
+	const file = input.files[0];
+	const reader = new FileReader();
+
+	reader.onload = (event) => {
+		const file = event.target.result;
+		const allLines = file.split(/\r\n|\n/);
+
+		let result = 0;
+		
+		allLines.forEach((line) => {
+			const blades = line.split(/\s/);
+			const metals =  new Map()
+			blades.forEach((blade) => {
+				if(blade.indexOf('<') > 0) {
+					softer = blade.substring(0,blade.indexOf('<'))
+					harder = blade.substring(blade.indexOf('<')+1)
+				}
+				else {
+					harder = blade.substring(0,blade.indexOf('>'))
+					softer = blade.substring(blade.indexOf('>')+1)
+				}
+				if(!metals.has(softer)) {
+					metals.set(softer,0)
+				}
+				if(!metals.has(harder)) {
+					metals.set(harder,0)
+				}
+				metals.set(softer,metals.get(softer) + 1)
+			})
+			const alloys = [...metals.entries()].sort((a, b) => a[1] - b[1])
+			console.log(alloys)
+			const total = alloys.reduce((total, metals) => total + metals[0],'');
+			console.log(total)
+			result += Number(total)
+ 		});
+
+		document.getElementById('result').value = result;
+	};
+
+	reader.onerror = (event) => {
+		alert(event.target.error.name);
+	};
+
+	reader.readAsText(file);
+}
+
+window.onload = function() {
+	document.getElementById('file').addEventListener('change',function() {
+		document.getElementById('result').value = 0;
+		everybodyCodesFunction(this)
+	})
+}
+
+</script>
+</head>
+<body>
+	<input type="file" name="file" id="file" accept=".txt">
+	<hr />
+	<label for="result">Result</label>
+	<textarea id="result"></textarea>
+</body>
+</html>
