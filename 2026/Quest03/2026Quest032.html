@@ -26,7 +26,6 @@ function everybodyCodesFunction(input) {
 				fullStandard = standard + fullStandard
 			}
 			fullStandard = fullStandard.slice(-1 * vote.length)
-			console.log(fullStandard)
 			for(var i=0;i<fullStandard.length;i++) {
 				decimalVote += parseInt(vote[i]) * parseInt(fullStandard[i])**(fullStandard.length - i - 1)
 			}
