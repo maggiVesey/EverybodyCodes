@@ -18,6 +18,10 @@ function everybodyCodesFunction(input) {
 			const blades = line.split(/\s/);
 			const metals =  new Map()
 			blades.forEach((blade) => {
+				
+				let softer = ''
+				let harder = ''
+				
 				if(blade.indexOf('<') > 0) {
 					softer = blade.substring(0,blade.indexOf('<'))
 					harder = blade.substring(blade.indexOf('<')+1)
