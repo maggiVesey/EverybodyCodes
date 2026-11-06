@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Everybody Codes</title>
+<script>
+
+function everybodyCodesFunction(input) {
+
+	const file = input.files[0];
+	const reader = new FileReader();
+
+	reader.onload = (event) => {
+		const file = event.target.result;
+		const allLines = file.split(/\r\n|\n/);
+
+		let result = 0;
+		
+		allLines.forEach((line) => {
+			const ballot = line.split(/\s/);
+			let standard = ballot[0].substring(4)
+			let vote = ballot[1]
+			let decimalVote = 0
+			
+			for(var i=0;i<standard.length;i++) {
+				decimalVote += parseInt(vote[i]) * parseInt(standard[i])**(standard.length - i - 1)
+			}
+			console.log(decimalVote)
+			result += decimalVote
+ 		});
+
+		document.getElementById('result').value = result;
+	};
+
+	reader.onerror = (event) => {
+		alert(event.target.error.name);
+	};
+
+	reader.readAsText(file);
+}
+
+window.onload = function() {
+	document.getElementById('file').addEventListener('change',function() {
+		document.getElementById('result').value = 0;
+		everybodyCodesFunction(this)
+	})
+}
+
+</script>
+</head>
+<body>
+	<input type="file" name="file" id="file" accept=".txt">
+	<hr />
+	<label for="result">Result</label>
+	<textarea id="result"></textarea>
+</body>
+</html>
