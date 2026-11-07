@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Everybody Codes</title>
+<script>
+
+function everybodyCodesFunction(input) {
+
+	const file = input.files[0];
+	const reader = new FileReader();
+
+	reader.onload = (event) => {
+		const file = event.target.result;
+		const allLines = file.split(/\r\n|\n/);
+
+		let result = 0;
+		const tournamentResults = []
+		
+		allLines.forEach((line) => {
+			const results = line.split(/\s/);
+			
+			let id = results[0].split('=')[1]
+			let quest = parseInt(results[1].split('=')[1])
+			let part = parseInt(results[2].split('=')[1])
+			let time = parseInt(results[3].split('=')[1])
+			
+			tournamentResults.push({id:id,quest:quest,part:part,points:0,time:time,timeOnQuest:0})
+			
+ 		});
+		tournamentResults.sort((a, b) => {
+			return a.id - b.id || a.quest - b.quest || a.part - b.part
+		})
+		let previousId = -1
+		let previousQuest = -1
+		let previousTime = 0
+		
+		for(let i=0; i<tournamentResults.length;i++) {
+			if(tournamentResults[i].id != previousId || tournamentResults[i].quest != previousQuest) {
+				previousTime = 0
+			}
+			previousTime += tournamentResults[i].time
+			tournamentResults[i].timeOnQuest = previousTime
+
+			previousId = tournamentResults[i].id
+			previousQuest = tournamentResults[i].quest
+			
+		}
+		tournamentResults.sort((a, b) => {
+			return a.quest - b.quest || a.part - b.part || a.timeOnQuest - b.timeOnQuest
+		})
+ 			
+		let previousPart = -1
+		let points=0
+		let previousPoints=0
+		let previousTimeOnQuest=0
+		
+		for(let i=0; i<tournamentResults.length;i++) {
+			if(tournamentResults[i].part != previousPart) {
+				switch(tournamentResults[i].part) {
+					case 1: points = 50;break
+					case 2: points = 100;break
+					case 3: points = 150;break
+					default: points=0
+				}
+				previousPart = tournamentResults[i].part
+			}
+			else {
+				if(points > 0) {
+					points--
+				}
+			}
+			if(tournamentResults[i].timeOnQuest == previousTimeOnQuest) {
+				tournamentResults[i].points = previousPoints
+			}
+			else {
+				tournamentResults[i].points = points
+			}
+			previousTimeOnQuest = tournamentResults[i].timeOnQuest
+			previousPoints = tournamentResults[i].points
+			
+		}
+		const totalPoints = new Map()
+		for(let i=0; i<tournamentResults.length;i++) {
+			if(!totalPoints.has(tournamentResults[i].id)) {
+				totalPoints.set(tournamentResults[i].id,0)
+			}
+			totalPoints.set(tournamentResults[i].id,totalPoints.get(tournamentResults[i].id) + tournamentResults[i].points)
+		}
+		
+//		console.log(tournamentResults)
+//		console.log(totalPoints)
+	
+		const ranks = [...totalPoints.entries()].sort((a, b) => {
+			return b[1] - a[1]
+		})
+//		console.log(ranks)
+	
+		let previousIndex = -1
+		let previousScore = -1
+		
+		result = ranks.reduce((total, rank, index) => {
+			if(rank[1] != previousScore) {
+				previousIndex = index + 1
+			}
+			previousScore = rank[1]
+			return total + (previousIndex * rank[1])
+		},0);
+		document.getElementById('result').value = result;
+	};
+
+	reader.onerror = (event) => {
+		alert(event.target.error.name);
+	};
+
+	reader.readAsText(file);
+}
+
+window.onload = function() {
+	document.getElementById('file').addEventListener('change',function() {
+		document.getElementById('result').value = 0;
+		everybodyCodesFunction(this)
+	})
+}
+
+</script>
+</head>
+<body>
+	<input type="file" name="file" id="file" accept=".txt">
+	<hr />
+	<label for="result">Result</label>
+	<textarea id="result"></textarea>
+</body>
+</html>
