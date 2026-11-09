@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Everybody Codes</title>
+<style>
+	div {
+		font-family:monospace;
+		font-size:100%;
+	}
+</style>
+<script>
+function drawGrid(grid) {
+	let tableString = '<table>'
+	for(let i=0;i<grid.length;i++) {
+		tableString += '<tr>'
+		for(let j=0;j<grid[i].length;j++) {
+			tableString += '<td';
+			tableString += ' id="td_'+i+'_'+j+'"';
+			tableString += '>'
+			tableString += grid[i][j]
+			tableString += '</td>'
+		}
+		tableString += '</tr>'
+	}
+	tableString += '</table>'
+	document.getElementById("grid").innerHTML = tableString;
+}
+
+const adjacentPositions = [
+    [-1,-1],[-1,0],[-1,1],
+    [0,-1],[0,1],
+    [1,-1],[1,0],[1,1]
+];
+	
+function getNeighbour(grid,row,column) {
+	if(column < 0 || row < 0) {
+		return '.';
+	}	
+	if(row >= grid.length || column >= grid[row].length) {
+		return '.';
+	}
+	return grid[row][column]
+}
+function everybodyCodesFunction(input) {
+
+	const file = input.files[0];
+	const reader = new FileReader();
+
+	reader.onload = (event) => {
+		const file = event.target.result;
+		const allLines = file.split(/\r\n|\n/);
+
+		let result = 0;	
+		const grid = []
+		const cellsToCheck = []
+		
+		allLines.forEach((line) => {
+			grid.push(line.split(''))
+ 		});
+ 		
+ 		let firstRow = Math.floor(grid.length/2)
+ 		let firstColumn = Math.floor(grid[firstRow].length/2)
+ 		
+ 		cellsToCheck.push({row:firstRow,column:firstColumn})
+ 
+ 	    while (cellsToCheck.length > 0) {
+ 				
+	        const currentCell = cellsToCheck.shift();
+			let neighbours = '';
+	        for(const [x,y] of adjacentPositions) {
+ 				neighbours += getNeighbour(grid,currentCell.row+x,currentCell.column+y)
+    		}
+
+			if(grid[currentCell.row][currentCell.column] != '#' && neighbours.match(/[#1]/g).length >= 5) {
+		 		grid[currentCell.row][currentCell.column] = '#'
+		 		
+		 		result++
+		 		
+		        for(const [x,y] of adjacentPositions) {
+		        	if(getNeighbour(grid,currentCell.row+x,currentCell.column+y) != '.') {
+						cellsToCheck.push({row:currentCell.row+x,column:currentCell.column+y})
+		        	}
+	    		}
+		 	}	
+	    }
+//  		drawGrid(grid)
+ 		
+		document.getElementById('result').value = result;
+	};
+
+	reader.onerror = (event) => {
+		alert(event.target.error.name);
+	};
+
+	reader.readAsText(file);
+}
+
+window.onload = function() {
+	document.getElementById('file').addEventListener('change',function() {
+		document.getElementById('result').value = 0;
+		everybodyCodesFunction(this)
+	})
+}
+
+</script>
+</head>
+<body>
+	<input type="file" name="file" id="file" accept=".txt">
+	<hr />
+	<label for="result">Result</label>
+	<textarea id="result"></textarea>
+	<div id="grid"></div>
+</body>
+</html>
